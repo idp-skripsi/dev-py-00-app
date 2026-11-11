@@ -1,18 +1,17 @@
 FROM python:3.12-slim
 
+LABEL org.opencontainers.image.source="https://github.com/idp-skripsi/dev-py-00-app"
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Salin requirements dulu agar layer cache bekerja
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Buat user non-root
 RUN useradd --create-home appuser
 
-# Salin kode aplikasi
 COPY app/ ./app/
 
 USER appuser
