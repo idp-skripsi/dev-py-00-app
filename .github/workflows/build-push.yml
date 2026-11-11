@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - main
+env:
+  IMAGE_NAME: ghcr.io/idp-skripsi/dev-py-00-app
+  CONFIG_REPO: idp-skripsi/dev-py-00-config
 jobs:
   build-push:
     runs-on: ubuntu-latest
@@ -34,3 +37,32 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+      - name: checkout config repo
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.CONFIG_REPO }}
+          token: ${{ secrets.CONFIG_REPO_TOKEN }}
+          path: config
+      - name: update image and push config
+        working-directory: config
+        env:
+          IMAGE_TAG: ${{ steps.meta.outputs.version }}
+        run: |
+          kustomize version
+          go install sigs.k8s.io/kustomize/kustomize/v5@v5.6.0
+          "$(go env GOPATH)/bin/kustomize" edit set image \
+            ${{ env.IMAGE_NAME }}=${{ env.IMAGE_NAME }}:${IMAGE_TAG}
+          echo "Updated image tag to ${IMAGE_TAG}"
+          "$(go env GOPATH)/bin/kustomize" build .
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add kustomization.yaml
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: update dev-py-00-app image to ${IMAGE_TAG}"
+          git push origin HEAD:main
