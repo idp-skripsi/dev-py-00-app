@@ -49,11 +49,10 @@ jobs:
           IMAGE_TAG: ${{ steps.meta.outputs.version }}
         run: |
           kustomize version
-          go install sigs.k8s.io/kustomize/kustomize/v5@v5.6.0
-          "$(go env GOPATH)/bin/kustomize" edit set image \
+          kustomize edit set image \
             ${{ env.IMAGE_NAME }}=${{ env.IMAGE_NAME }}:${IMAGE_TAG}
           echo "Updated image tag to ${IMAGE_TAG}"
-          "$(go env GOPATH)/bin/kustomize" build .
+          kubectl kustomize .
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
