@@ -14,9 +14,9 @@ app = FastAPI(
 def root():
     return {"message": "Welcome to the Product catalog API!"}
 
-@app.get("/version")
-def version():
-    return{"service" : SERVICE_NAME, "version": API_VERSION}
+@app.get("/ready")
+def readiness():
+    return {"status": "ready"}
 
 @app.get("/healthz")
 def health():

@@ -4,7 +4,7 @@ on:
     branches:
       - main
 env:
-  IMAGE_NAME: ghcr.io/idp-skripsi/dev-py-00-app
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
   CONFIG_REPO: idp-skripsi/dev-py-00-config
 jobs:
   build-push:
